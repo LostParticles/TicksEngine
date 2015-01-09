@@ -4,7 +4,7 @@ The library is a portable library modified from an old code for me that was inte
 
 yep i created the midi sequencer using this code.
 
-Midi depends on messages that was sent using serial ports 
+Midi depends on messages that is being sent over serial ports and the mid file actually contains the binary representation of these messages.
 
 any way
 
