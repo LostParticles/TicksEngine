@@ -1,0 +1,16 @@
+﻿Tick in the library means amount of beats
+
+
+
+Overview:
+--------
+
+The Tick Library contains a Tick Manager
+the Tick Manager is able to produce Ticks in the specified Tempo i.e. BPM (Beats Per Minute)
+
+The idea is to store Ticks in the tick manager 
+then when starting the tick manager it call the ticks codes based on the BPM value
+
+each Tick has a hold beats and duration beats
+
+for example if you pushed two ticks the tick manager will play their starting and ending procs
