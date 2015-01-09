@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LostParticles.TickEvents</RootNamespace>
-    <AssemblyName>TickEvents</AssemblyName>
+    <AssemblyName>LostParticles.TickEvents</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -33,6 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>LostParticles.TickEvents.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="AccurateTickEventsManager.cs" />
     <Compile Include="EventsPlayer.cs" />
@@ -40,6 +46,9 @@
     <Compile Include="ITickEventsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TickEvent.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LostParticles.TickEvents.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
