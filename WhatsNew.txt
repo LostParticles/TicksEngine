@@ -1,0 +1,15 @@
+[TickEvents 1.1]
+
+- Separated ITicksEventsManager into ITicksManager and ITicksGenerator.
+- Made a base class TicksManager that implements ITicksManager
+- Made WindowsTicksGenerator that inherit TicksManager and implement ITicksGenerator.
+- Added Unit Test fot the TicksManager class and solved many errors with it
+-  Added some illustrative images under the documentation folder
+
+- Next version: is to implement HardwareTicksGenerator and test it along WindowsTicksGenerator.
+   then after that i will remove the legacy code of AccurateTickEventsManager and TickEventsManager.
+
+   also I want to add svg image capability to draw the events as it seen in documentation images.
+
+   another thing is to add SlowGenerator for events that occur on daily basis or more.
+

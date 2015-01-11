@@ -8,12 +8,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6111210-9B92-4123-847B-BBFA73C3C80B}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		WhatsNew.txt = WhatsNew.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{DCFEB014-62A5-4F93-B59E-64F04713A491}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\How To use the Tick Library.txt = Documentation\How To use the Tick Library.txt
+		Documentation\TickEvent Ending.png = Documentation\TickEvent Ending.png
+		Documentation\TickEvents Planning.png = Documentation\TickEvents Planning.png
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicksUnitTest", "TicksUnitTest\TicksUnitTest.csproj", "{2AA583D8-7146-4ED1-83DC-88C342892E92}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{D3CEF9EB-5FC8-41B4-9195-C8E0B43C7289}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,8 +32,15 @@ Global
 		{B7D38246-AD98-4557-A223-C07941AFC7CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7D38246-AD98-4557-A223-C07941AFC7CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7D38246-AD98-4557-A223-C07941AFC7CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AA583D8-7146-4ED1-83DC-88C342892E92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AA583D8-7146-4ED1-83DC-88C342892E92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AA583D8-7146-4ED1-83DC-88C342892E92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AA583D8-7146-4ED1-83DC-88C342892E92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2AA583D8-7146-4ED1-83DC-88C342892E92} = {D3CEF9EB-5FC8-41B4-9195-C8E0B43C7289}
 	EndGlobalSection
 EndGlobal

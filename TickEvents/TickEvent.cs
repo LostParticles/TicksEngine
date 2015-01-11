@@ -1,3 +1,4 @@
+using LostParticles.TickEvents.Manager;
 using System;
 
 namespace LostParticles.TickEvents
@@ -10,12 +11,12 @@ namespace LostParticles.TickEvents
     {
 
         #region Tick Events
-        public event EventHandler TickStarted;
-        public event EventHandler TickStopped;
-        public event EventHandler TickSuspended;
-        public event EventHandler TickResumed;
-        public event EventHandler TickRestarted;
-        public event EventHandler TickNotified;
+        public event EventHandler TickEventStarted;
+        public event EventHandler TickEventStopped;
+        public event EventHandler TickEventSuspended;
+        public event EventHandler TickEventResumed;
+        public event EventHandler TickEventRestarted;
+        public event EventHandler TickEventNotified;
         #endregion
 
         #region Tick Instantiation.
@@ -34,8 +35,8 @@ namespace LostParticles.TickEvents
             DurationBeats = durationBeats;
         }
 
-        private ITickEventsManager _TicksManager;
-        public ITickEventsManager TicksManager
+        private ITicksManager _TicksManager;
+        public ITicksManager TicksManager
         {
             get
             {
@@ -104,6 +105,27 @@ namespace LostParticles.TickEvents
         }
 
 
+        private long _LateFinishTicks;
+
+        /// <summary>
+        /// Indicates that the ending signal happened after the actual duration of the tick event.
+        /// </summary>
+        public bool OverflowFinishingTicks
+        {
+            get 
+            {
+                return _LateFinishTicks > 0;
+            }
+        }
+
+        public long LateFinishTicks
+        {
+            get
+            {
+                return _LateFinishTicks;
+            }
+        }
+
         /// <summary>
         /// Tell the tick event that there are more ticks
         /// have been elapsed since you start.
@@ -111,12 +133,31 @@ namespace LostParticles.TickEvents
         /// or the event is suspended
         /// </summary>
         /// <param name="Ticks">Number of ticks elapsed since the TickEvent Started.</param>
-        private void UpdateElapsedTicks(long ticksCount)
+        private void UpdateElapsedTicks(long deltaTicksCount)
         {
-            _ElapsedTicksSinceStart += ticksCount;
-            if (TickNotified != null) TickNotified(this, null);
+            _ElapsedTicksSinceStart += deltaTicksCount;
+
+            _LateFinishTicks = _ElapsedTicksSinceStart - DurationTicks;
+
+            if (_LateFinishTicks > 0)
+            {
+                TicksUpdated(deltaTicksCount - _LateFinishTicks);  // in case the notification of ticks exceeding actual duration ticks for this event
+            }
+            else
+                TicksUpdated(deltaTicksCount);
+
+
+            if (TickEventNotified != null) TickEventNotified(this, null);
         }
 
+        /// <summary>
+        /// Called whenever the event has its ticks updated.
+        /// </summary>
+        /// <param name="deltaTicksCount"></param>
+        public virtual void TicksUpdated(long deltaTicksCount)
+        {
+            
+        }
 
         /// <summary>
         /// Notify the tick instance with the elapsed ticks.
@@ -156,12 +197,17 @@ namespace LostParticles.TickEvents
         }
 
 
-        internal void AfterBegin()
+        private long _LateStartTicks;
+
+        /// <summary>
+        /// Ticks count on the start of the event. 
+        /// </summary>
+        public long LateStartTicks { get { return _LateStartTicks; } }
+        
+
+        internal void BeforeBegin(long lateStartTicks)
         {
-            _CurrentState = EventState.Started;
-
-            if (TickStarted != null) TickStarted(this, TickArgs);
-
+            _LateStartTicks = lateStartTicks;
         }
 
         /// <summary>
@@ -171,6 +217,23 @@ namespace LostParticles.TickEvents
         {
 
         }
+
+
+        internal void AfterBegin()
+        {
+            _CurrentState = EventState.Started;
+
+            if (TickEventStarted != null) TickEventStarted(this, TickArgs);
+
+            this.UpdateElapsedTicks(_LateStartTicks);
+
+        }
+
+        internal void BeforeEnd()
+        {
+
+        }
+
 
         /// <summary>
         /// End the current Tick operation.
@@ -186,7 +249,7 @@ namespace LostParticles.TickEvents
         internal void AfterEnd()
         {
             _CurrentState = EventState.Ended;
-            if (TickStopped != null) TickStopped(this, TickArgs);
+            if (TickEventStopped != null) TickEventStopped(this, TickArgs);
         }
 
         /// <summary>
@@ -196,7 +259,7 @@ namespace LostParticles.TickEvents
         public virtual void Suspend()
         {
             _CurrentState = EventState.Suspended;
-            if (TickSuspended != null) TickSuspended(this, TickArgs);
+            if (TickEventSuspended != null) TickEventSuspended(this, TickArgs);
         }
 
         /// <summary>
@@ -205,7 +268,7 @@ namespace LostParticles.TickEvents
         public virtual void Resume()
         {
             _CurrentState = EventState.Started;
-            if (TickResumed != null) TickResumed(this, TickArgs);
+            if (TickEventResumed != null) TickEventResumed(this, TickArgs);
         }
 
 
@@ -216,7 +279,7 @@ namespace LostParticles.TickEvents
         {
             _CurrentState = EventState.NotStarted;
             _ElapsedTicksSinceStart = 0;
-            if (TickRestarted != null) TickRestarted(this, TickArgs);
+            if (TickEventRestarted != null) TickEventRestarted(this, TickArgs);
         }
 
         #endregion

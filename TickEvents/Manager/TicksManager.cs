@@ -1,69 +1,66 @@
-﻿using LostParticles.TickEvents.Manager;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-
-
-namespace LostParticles.TickEvents
+namespace LostParticles.TickEvents.Manager
 {
     /// <summary>
-    /// Accurate Ticks Manager use the hardware stopwatch and adjusted algorithm to ensure that events are on time. 
+    /// Responsible on managing stored TickEvents
+    /// contains Two Lists of EventTicks
+    /// WaitingEvents  List is push first in first out List
+    /// RunningEvents  List is a list which its events all are processed
     /// </summary>
-    public sealed class AccurateTickEventsManager: ITicksManager
+    public class TicksManager : ITicksManager
     {
-
         public event EventHandler FinishedEvent;
 
-        #region TickGenerator
-
-
         /// <summary>
-        /// Ticks (based on StopWatch.Resolution TicksPerSecond) Per Beat
+        /// 1000 milli second
         /// </summary>
-        private long _TicksPerBeat;
+        protected long _TicksPerBeat;
 
 
-        private long CurrentTick;
-        private long PreviousTick;
+        protected long CurrentTick;
+        protected long PreviousTick;
 
+
+        protected double _BeatsPerMinute;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="bpm">Beats per minute</param>
-        public AccurateTickEventsManager(double beatsPerMinute)
+        public TicksManager(double beatsPerMinute)
         {
-            
-            //converting bpm into frequency of hardware timer 
-            // so I can know how many ticks the beat will consume
-            _TicksPerBeat = (long)((60 * Stopwatch.Frequency) / beatsPerMinute);
+            _BeatsPerMinute = beatsPerMinute;
 
+            //converting bpm into milliseconds per beat  which means one tick equal milli second
+
+            _TicksPerBeat = (int)(60000 / beatsPerMinute);
+
+            // it should be noted that in derived class the _TicksPerBeat should be different if you used highresolution timer.
         }
 
-
-
-
         /// <summary>
-        /// Beats Per Minute based on Stop Hardware stop watch.
+        /// Beats Per Minute
         /// </summary>
-        public double Tempo
+        public virtual double Tempo
         {
             get
             {
-                return (double)((60 * Stopwatch.Frequency) / _TicksPerBeat);
+                return _BeatsPerMinute;
             }
             set
             {
-                _TicksPerBeat = (long)((60 * Stopwatch.Frequency) / value);
+                _BeatsPerMinute = value;
             }
 
         }
 
         /// <summary>
         /// Ticks per beat.
-        /// Hardware Timer.Resolution as Ticks per beat.
         /// </summary>
         public long TicksPerBeat
         {
@@ -73,100 +70,6 @@ namespace LostParticles.TickEvents
             }
         }
 
-
-        #region Accurate Methods
-
-
-        IAsyncResult ar;
-        Action<bool> PlayProc;
-
-        /// <summary>
-        /// using Another Thread with high resolution performance counter
-        /// </summary>
-        public void Start()
-        {
-
-
-            PlayProc = RunningPlayThread;
-
-            ar = PlayProc.BeginInvoke(true, null, null);
-
-            
-
-            
-        }
-
-
-
-
-        /// <summary>
-        /// The thread that plays the events.
-        /// </summary>
-        private void RunningPlayThread(bool canStop)
-        {
-
-            Stopwatch sw = Stopwatch.StartNew();
-
-            while (!IsFinished)
-            {
-                CalculateAndSendStopWatchTicks(sw);
-                
-                //Thread.Sleep(0); //make time for other threads must in uniprocessor environment
-
-                if (canStop)
-                {
-                    //check if I {the current running proc} should stop
-                }
-
-            }
-
-            sw.Stop();
-
-            FinishedEvent(this, null);
-
-        }
-
-        public void Stop()
-        {
-            if (!ar.IsCompleted)
-            {
-                EndRunningEvents();
-                PlayProc.EndInvoke(ar);
-            }
-        }
-
-
-
-        bool SendingTicks;
-
-        /// <summary>
-        /// Calculate the elapsed ticks of the Stop watch timer.
-        /// </summary>
-        /// <param name="sw"></param>
-        public void CalculateAndSendStopWatchTicks(Stopwatch sw)
-        {
-            if (!SendingTicks)
-            {
-                CurrentTick = sw.ElapsedTicks;
-
-                //specify the delta ticks that were consumed till now.
-                long dTicks = CurrentTick - PreviousTick;
-
-                PreviousTick = CurrentTick;
-
-                SendingTicks = true;      //to prevent sending multiple ticks when calling exceed of the function increase 
-                if (dTicks > 0) SendAccurateTicks(dTicks);
-                SendingTicks = false;
-            }
-        }
-
-        #endregion
-
-
-
-
-
-        #endregion
 
         public void SendBeat()
         {
@@ -193,9 +96,9 @@ namespace LostParticles.TickEvents
 
         #region TickEvent Management
 
-        private Queue<TickEvent> WaitingEvents = new Queue<TickEvent>();
+        protected Queue<TickEvent> WaitingEvents = new Queue<TickEvent>();
 
-        private List<TickEvent> RunningEvents = new List<TickEvent>();
+        protected List<TickEvent> RunningEvents = new List<TickEvent>();
 
         private long _ElapsedTicks;
 
@@ -210,11 +113,12 @@ namespace LostParticles.TickEvents
             }
         }
 
+
         public double ElapsedBeats
         {
             get
             {
-                return _ElapsedTicks / _TicksPerBeat;
+                return (double)_ElapsedTicks / (double)_TicksPerBeat;
             }
         }
 
@@ -296,13 +200,13 @@ namespace LostParticles.TickEvents
             //the mximum ticks to be sended based on my assumption 
             // however in reality the maximum will equal the TicksPerBeat because in my events I deal with beats
             // but fot accuracy I decided to be half this value.
-            double MaximumTicksPerBeat = (TicksPerBeat / 2);
+            double MaximumTicksPerBeat = (_TicksPerBeat / 2);
 
             //how many times I'll call the internal sending ticks.
             double times = ticks / MaximumTicksPerBeat;
 
             //for example times = 3.6
-            while (times >= 0)
+            while (times > 0)
             {
                 if (times < 1)
                 {
@@ -357,16 +261,22 @@ namespace LostParticles.TickEvents
             {
                 TickEvent tev = WaitingEvents.Peek();
 
-                if (_TicksFromLastRunningEvent >= tev.HoldTicks)
+                if (_TicksFromLastRunningEvent > tev.HoldTicks)
                 {
                     tev = WaitingEvents.Dequeue();
                     
                     RunningEvents.Add(tev);
 
-                    tev.Begin();
+                    long PassedTicksSinceLastRunningEvent = _TicksFromLastRunningEvent - tev.HoldTicks;
+
+                    tev.BeforeBegin(PassedTicksSinceLastRunningEvent);
+
+                    tev.End();  // execute user code.
+
                     tev.AfterBegin();
 
-                    _TicksFromLastRunningEvent = 0;
+                    _TicksFromLastRunningEvent = PassedTicksSinceLastRunningEvent;
+
 
                     //important if the next event is having 0 events
                     //then we should tell the control method to call this
@@ -374,9 +284,13 @@ namespace LostParticles.TickEvents
                     if (WaitingEvents.Count > 0)
                     {
                         if (WaitingEvents.Peek().HoldTicks == 0)
+                        {
                             return true;
+                        }
                         else
+                        {
                             return false;
+                        }
                     }
                     else
                     {
@@ -424,7 +338,8 @@ namespace LostParticles.TickEvents
                 //specify if the event is already passed the reaquired ticks
                 if (tev.ElapsedTicksSinceStart >= tev.DurationTicks)
                 {
-                    tev.End();
+                    tev.BeforeEnd();
+                    tev.End();          // execute user code.
                     tev.AfterEnd();
 
                     //remove the item
@@ -460,7 +375,7 @@ namespace LostParticles.TickEvents
         /// <summary>
         /// Force running events to end their life.
         /// </summary>
-        private void EndRunningEvents()
+        protected void EndRunningEvents()
         {
 
             int index = RunningEvents.Count - 1;
@@ -473,6 +388,9 @@ namespace LostParticles.TickEvents
                 RunningEvents.RemoveAt(index);
             }
 
+
+            if (FinishedEvent != null) FinishedEvent(this, new EventArgs());
+
         }
 
         #endregion
@@ -480,5 +398,4 @@ namespace LostParticles.TickEvents
 
 
     }
-
 }

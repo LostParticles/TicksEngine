@@ -4,6 +4,7 @@ using System.Threading;
 
 using System;
 using System.Threading.Tasks;
+using LostParticles.TickEvents.Manager;
 
 namespace LostParticles.TickEvents
 {
@@ -13,9 +14,9 @@ namespace LostParticles.TickEvents
     public class EventsPlayer
     {
 
-        private List<ITickEventsManager> TicksManagers = new List<ITickEventsManager>();
+        private List<ITicksManager> TicksManagers = new List<ITicksManager>();
 
-        public void AddTickManager(ITickEventsManager ticksManager)
+        public void AddTickManager(ITicksManager ticksManager)
         {
             TicksManagers.Add(ticksManager);
         }
@@ -100,7 +101,7 @@ namespace LostParticles.TickEvents
 
         public void SendTick()
         {
-            foreach (ITickEventsManager atm in TicksManagers)
+            foreach (ITicksManager atm in TicksManagers)
             {
                 atm.SendTick();
             }
@@ -108,7 +109,7 @@ namespace LostParticles.TickEvents
 
         public void SendTicks(long ticks)
         {
-            foreach (ITickEventsManager atm in TicksManagers)
+            foreach (ITicksManager atm in TicksManagers)
             {
                 lock (atm)
                 {
@@ -125,7 +126,7 @@ namespace LostParticles.TickEvents
             {
                 bool fin = true;
 
-                foreach (ITickEventsManager tm in TicksManagers)
+                foreach (ITicksManager tm in TicksManagers)
                 {
                     fin &= tm.IsFinished;
                 }

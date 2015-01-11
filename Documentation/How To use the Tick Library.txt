@@ -14,3 +14,23 @@ then when starting the tick manager it call the ticks codes based on the BPM val
 each Tick has a hold beats and duration beats
 
 for example if you pushed two ticks the tick manager will play their starting and ending procs
+
+
+
+About Timing:
+---------------
+
+each tick event  is played sequentially after the previous tick
+
+the holdBeat  count   holds the event from starting until the hold beats are over
+
+so when the holdBeat is equal 0  the event starts the previous event
+
+this means that holdBeat is a delta time between current event and previous event starting time.
+
+
+
+
+About TicksManager:
+--------------------
+you can inherit this class for the Tick Generator you desire 

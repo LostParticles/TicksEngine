@@ -1,7 +1,7 @@
+using LostParticles.TickEvents.Manager;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
 
 namespace LostParticles.TickEvents
@@ -10,19 +10,18 @@ namespace LostParticles.TickEvents
     /// <summary>
     /// Responsible on managing stored TickEvents
     /// contains Two Lists of EventTicks
-    /// WaitingEvents  List is push first int first out List
+    /// WaitingEvents  List is push first in first out List
     /// RunningEvents  List is a list which its events all are processed
     /// </summary>
-    public sealed class TickEventsManager : ITickEventsManager, IDisposable
+    public sealed class TickEventsManager : ITicksManager, IDisposable
     {
 
         public event EventHandler FinishedEvent;
 
         #region TickGenerator
+        
+        Timer MyTimer;
 
-        System.Timers.Timer MyTimer;
-
-        BackgroundWorker PlayWorker;
 
         //what about making all timings in MilliSecond
         //Second = 1000 MilliSecond
@@ -34,10 +33,6 @@ namespace LostParticles.TickEvents
         private  int MilliSecondsPerBeat;
 
 
-        /// <summary>
-        /// Ticks (based on StopWatch.Resolution TicksPerSecond) Per Beat
-        /// </summary>
-        private long _TicksPerBeat;
 
 
         private long CurrentTick;
@@ -54,28 +49,12 @@ namespace LostParticles.TickEvents
             //converting bpm into milliseconds per beat
             MilliSecondsPerBeat = (int)(60000 / beatsPerMinute);
 
-            //converting bpm into frequency of hardware timer 
-            _TicksPerBeat = (long)((60 * Stopwatch.Frequency)/beatsPerMinute);
+
+            TimerCallback ElapsedTimer = MyTimer_Elapsed;
 
 
             //making windows timere call the event two times the required beat
-            MyTimer = new System.Timers.Timer(MilliSecondsPerBeat/2);
-            MyTimer.Elapsed += new System.Timers.ElapsedEventHandler(MyTimer_Elapsed);
-
-
-            
-            //worker mechanism to play ticks and monitoring the running thread to close it
-            PlayWorker = new BackgroundWorker();
-
-            
-
-            PlayWorker.WorkerSupportsCancellation = true;
-
-            PlayWorker.DoWork += new DoWorkEventHandler(PlayWorker_DoWork);
-
-            PlayWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayWorker_RunWorkerCompleted);
-
-
+            MyTimer = new Timer(ElapsedTimer, null, Timeout.Infinite, Timeout.Infinite);
 
             
         }
@@ -95,124 +74,28 @@ namespace LostParticles.TickEvents
                 MilliSecondsPerBeat = (int)(60000 / value);
                 //call the event two times the required beat
                  
-                MyTimer.Interval = MilliSecondsPerBeat / 2;
+                MyTimer.Change(0, MilliSecondsPerBeat / 2);
             }
         }
 
-
-        /// <summary>
-        /// Beats Per Minute based on Stop Hardware stop watch.
-        /// </summary>
-        public double AccurateTempo
-        {
-            get
-            {
-                return (double)((60 * Stopwatch.Frequency) / _TicksPerBeat);
-            }
-            set
-            {
-                _TicksPerBeat = (long)((60 * Stopwatch.Frequency) / value);
-            }
-
-        }
 
         /// <summary>
         /// Ticks per beat.
-        /// If using windows timer it will use 1000 tick per second as resolution.
-        /// If using Hardware timer it will use Timer.Resolution of the hardware.
+        /// Using windows timer it will use 1000 tick per second as resolution.
         /// </summary>
         public long TicksPerBeat
         {
             get
             {
-                if (UseAccurateTiming)
-                    return _TicksPerBeat;  //based on the frequency of high performance counter hardware found in the pc
-                else
-                    return MilliSecondsPerBeat;
+                return MilliSecondsPerBeat;
             }
         }
 
  
 
 
-        #region Accurate Methods
 
-
-        /// <summary>
-        /// setting this property to true 
-        /// makes the tick events use the property
-        /// TickPerBeat which corresponds to the high perfromance counter
-        /// frequency
-        /// </summary>
-        private bool UseAccurateTiming;
-
-
-        /// <summary>
-        /// Start the the ticks generation in Background worker object.
-        /// Use High Resolution timer.
-        /// </summary>
-        public void StartAccurate()
-        {
-
-            PlayWorker.RunWorkerAsync();
-
-            //original code with threads but I don't have 
-            //notification when thread ends.
-            //or when the thread updates the UI the exception occure.
-            //so instead of this I made it Backgroundworker thread which is not
-            //accurate.
-            //Thread th = new Thread(RunningPlayThread);
-            //th.Start();
-            
-
-        }
-
-        void PlayWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            RunningPlayThread();
-        }
-
-        void PlayWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (FinishedEvent != null)
-            {
-                FinishedEvent(this, null);
-            }
-        }
-
-
-        /// <summary>
-        /// The thread that plays the events. When StartAccurate() called.
-        /// </summary>
-        private void RunningPlayThread()
-        {
-            UseAccurateTiming = true;
-
-            Stopwatch sw = Stopwatch.StartNew();
-
-            while (WaitingEvents.Count > 0 || RunningEvents.Count > 0)
-            {
-                CalcAndSendStopWatchTicks(sw);
-                Thread.Sleep(0); //make time for other threads must in uniprocessor environment
-
-                if (PlayWorker.CancellationPending)
-                {
-                    EndRunningEvents();
-                    break;
-                }
-            }
-
-            sw.Stop();
-            
-            
-
-            UseAccurateTiming = false;
-        }
-
-        public void StopAccurate()
-        {
-            PlayWorker.CancelAsync();
-        }
+        bool SendingTicks;
 
         public bool IsFinished
         {
@@ -222,38 +105,17 @@ namespace LostParticles.TickEvents
             }
         }
 
-
-        bool SendingTicks;
-
-        /// <summary>
-        /// Calculate the elapsed ticks of the Stop watch timer.
-        /// </summary>
-        /// <param name="sw"></param>
-        private void CalcAndSendStopWatchTicks(Stopwatch sw)
-        {
-            if (!SendingTicks)
-            {
-                CurrentTick = sw.ElapsedTicks;
-                
-                long dTicks = CurrentTick - PreviousTick;
-                
-                PreviousTick = CurrentTick;
-
-                SendingTicks = true;
-                if (dTicks > 0) SendTicks(dTicks);
-                SendingTicks = false;
-            }
-        }
-
-        #endregion
-
-
-
         #region Non Accurate Methods based on windows timer.
         public void Start()
         {
             PreviousTick = (uint)Environment.TickCount;
-            MyTimer.Start();
+            MyTimer.Change(0, MilliSecondsPerBeat / 2);
+        }
+
+
+        public void SendAccurateTicks(long ticks)
+        {
+            SendTicks(ticks);
         }
 
 
@@ -293,27 +155,27 @@ namespace LostParticles.TickEvents
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void MyTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        void MyTimer_Elapsed(object state)
         {
             SendTicks();
             //check if there are more events to process
             if (WaitingEvents.Count == 0 && RunningEvents.Count == 0)
             {
                 //to ensure that after notes timer is stopped
-                MyTimer.Stop();
+                MyTimer.Change(Timeout.Infinite, Timeout.Infinite);
             }
         }
 
         public void Stop()
         {
             EndRunningEvents();
-            MyTimer.Stop();
+            MyTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         #endregion
 
-
         #endregion
+
 
         #region TickEvent Management
 
@@ -331,6 +193,14 @@ namespace LostParticles.TickEvents
             get
             {
                 return _ElapsedTicks;
+            }
+        }
+
+        public double ElapsedBeats
+        {
+            get
+            {
+                return _ElapsedTicks / MilliSecondsPerBeat;
             }
         }
 
@@ -384,16 +254,6 @@ namespace LostParticles.TickEvents
         }
 
 
-        /// <summary>
-        /// Send Accurate Ticks instruct the object to use the high resolution timer to calculate its events.
-        /// </summary>
-        /// <param name="ticks"></param>
-        public void SendAccurateTicks(long ticks)
-        {
-            UseAccurateTiming = true;
-            SendTicks(ticks);
-            UseAccurateTiming = false;
-        }
 
         /// <summary>
         /// Send ticks but with the resolution of the 1000 ms per second.
@@ -542,6 +402,31 @@ namespace LostParticles.TickEvents
             }
         }
 
+        public void SendBeat()
+        {
+            SendAccurateTicks(TicksPerBeat);
+        }
+
+
+        public int RemainingBeatTicks
+        {
+            get
+            {
+                if (_ElapsedTicks < MilliSecondsPerBeat) return (int)(MilliSecondsPerBeat - _ElapsedTicks);
+                else
+                {
+                    int remaining_beat_ticks = (int)(MilliSecondsPerBeat - (_ElapsedTicks % MilliSecondsPerBeat));
+                    return remaining_beat_ticks;
+                }
+            }
+        }
+
+
+        public void SendRemainingBeat()
+        {
+            SendAccurateTicks(RemainingBeatTicks);
+        }
+
 
         /// <summary>
         /// mainly to inform running events about current ticks
@@ -600,7 +485,6 @@ namespace LostParticles.TickEvents
             if (disposing)
             {
                 MyTimer.Dispose();
-                PlayWorker.Dispose();
             }
         }
 
