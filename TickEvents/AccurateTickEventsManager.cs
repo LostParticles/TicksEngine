@@ -1,4 +1,4 @@
-﻿using LostParticles.TickEvents.Manager;
+﻿using LostParticles.TicksEngine.Manager;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +6,7 @@ using System.Threading;
 
 
 
-namespace LostParticles.TickEvents
+namespace LostParticles.TicksEngine
 {
     /// <summary>
     /// Accurate Ticks Manager use the hardware stopwatch and adjusted algorithm to ensure that events are on time. 

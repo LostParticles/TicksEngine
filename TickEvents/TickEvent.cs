@@ -1,7 +1,7 @@
-using LostParticles.TickEvents.Manager;
+using LostParticles.TicksEngine.Manager;
 using System;
 
-namespace LostParticles.TickEvents
+namespace LostParticles.TicksEngine
 {
     /// <summary>
     /// TickEvent class is expressing Amount of Beats

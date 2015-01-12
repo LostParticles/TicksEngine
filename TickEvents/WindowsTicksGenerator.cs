@@ -1,4 +1,4 @@
-﻿using LostParticles.TickEvents.Manager;
+﻿using LostParticles.TicksEngine.Manager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LostParticles.TickEvents
+namespace LostParticles.TicksEngine
 {
     /// <summary>
     /// Ticks generator using the windows timer of 1000 milli second resolution

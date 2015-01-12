@@ -8,8 +8,8 @@
     <ProjectGuid>{B7D38246-AD98-4557-A223-C07941AFC7CE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LostParticles.TickEvents</RootNamespace>
-    <AssemblyName>LostParticles.TickEvents</AssemblyName>
+    <RootNamespace>LostParticles.TicksEngine</RootNamespace>
+    <AssemblyName>LostParticles.TicksEngine</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -43,6 +43,7 @@
     <Compile Include="AccurateTickEventsManager.cs" />
     <Compile Include="EventsPlayer.cs" />
     <Compile Include="EventState.cs" />
+    <Compile Include="HardwareTicksGenerator.cs" />
     <Compile Include="Manager\ITicksGenerator.cs" />
     <Compile Include="Manager\ITicksManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using LostParticles.TickEvents;
-using LostParticles.TickEvents.Manager;
+using LostParticles.TicksEngine;
+using LostParticles.TicksEngine.Manager;
 
 namespace TicksUnitTest
 {

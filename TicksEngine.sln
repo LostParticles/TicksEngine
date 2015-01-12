@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TickEvents", "TickEvents\TickEvents.csproj", "{B7D38246-AD98-4557-A223-C07941AFC7CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicksEngine", "TickEvents\TicksEngine.csproj", "{B7D38246-AD98-4557-A223-C07941AFC7CE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6111210-9B92-4123-847B-BBFA73C3C80B}"
 	ProjectSection(SolutionItems) = preProject

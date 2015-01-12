@@ -1,5 +1,5 @@
 ﻿
-namespace LostParticles.TickEvents.Manager
+namespace LostParticles.TicksEngine.Manager
 {
     public interface ITicksManager
     {

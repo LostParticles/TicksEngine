@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LostParticles.TickEvents.Manager
+namespace LostParticles.TicksEngine.Manager
 {
     /// <summary>
     /// Responsible on managing stored TickEvents

@@ -54,9 +54,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TickEvents\TickEvents.csproj">
+    <ProjectReference Include="..\TickEvents\TicksEngine.csproj">
       <Project>{b7d38246-ad98-4557-a223-c07941afc7ce}</Project>
-      <Name>TickEvents</Name>
+      <Name>TicksEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

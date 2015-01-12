@@ -1,10 +1,10 @@
-using LostParticles.TickEvents.Manager;
+using LostParticles.TicksEngine.Manager;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 
-namespace LostParticles.TickEvents
+namespace LostParticles.TicksEngine
 {
 
     /// <summary>

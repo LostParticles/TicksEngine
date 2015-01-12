@@ -1,4 +1,4 @@
-namespace LostParticles.TickEvents
+namespace LostParticles.TicksEngine
 {
     /// <summary>
     /// TickEvent State Enumeration.

@@ -4,9 +4,9 @@ using System.Threading;
 
 using System;
 using System.Threading.Tasks;
-using LostParticles.TickEvents.Manager;
+using LostParticles.TicksEngine.Manager;
 
-namespace LostParticles.TickEvents
+namespace LostParticles.TicksEngine
 {
     /// <summary>
     /// This class will deal with more than one TickManager instance to synchronize between them all.
