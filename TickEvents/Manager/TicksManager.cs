@@ -96,6 +96,8 @@ namespace LostParticles.TicksEngine.Manager
 
         #region TickEvent Management
 
+        protected List<TickEvent> ManagerEvents = new List<TickEvent>();
+
         protected Queue<TickEvent> WaitingEvents = new Queue<TickEvent>();
 
         protected List<TickEvent> RunningEvents = new List<TickEvent>();
@@ -143,6 +145,8 @@ namespace LostParticles.TicksEngine.Manager
         public void AddEvent(TickEvent tickEvent)
         {
             tickEvent.TicksManager = this;
+
+            ManagerEvents.Add(tickEvent);
             WaitingEvents.Enqueue(tickEvent);
         }
 
@@ -200,7 +204,7 @@ namespace LostParticles.TicksEngine.Manager
             //the mximum ticks to be sended based on my assumption 
             // however in reality the maximum will equal the TicksPerBeat because in my events I deal with beats
             // but fot accuracy I decided to be half this value.
-            double MaximumTicksPerBeat = (_TicksPerBeat / 2);
+            double MaximumTicksPerBeat = (_TicksPerBeat / 2.0);
 
             //how many times I'll call the internal sending ticks.
             double times = ticks / MaximumTicksPerBeat;
@@ -271,7 +275,7 @@ namespace LostParticles.TicksEngine.Manager
 
                     tev.BeforeBegin(PassedTicksSinceLastRunningEvent);
 
-                    tev.End();  // execute user code.
+                    tev.Begin();  // execute user code.
 
                     tev.AfterBegin();
 
@@ -383,7 +387,9 @@ namespace LostParticles.TicksEngine.Manager
             {
                 TickEvent tev = RunningEvents[index];
 
+                tev.BeforeEnd();
                 tev.End();
+                tev.AfterEnd();
 
                 RunningEvents.RemoveAt(index);
             }
@@ -395,6 +401,38 @@ namespace LostParticles.TicksEngine.Manager
 
         #endregion
 
+
+        /// <summary>
+        /// Gets the tick event at designated index.
+        /// </summary>
+        /// <param name="ix"></param>
+        /// <returns></returns>
+        public TickEvent this [int ix]
+        {
+            get
+            {
+                return ManagerEvents[ix];
+            }
+        }
+
+
+        Dictionary<string, object> ExtraStorage = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Store extra varaiables in the manager.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public void Store(string name, object value)
+        {
+            ExtraStorage[name] = value;
+        }
+
+        public T Retrieve<T>(string name)
+        {
+            return (T)ExtraStorage[name];
+        }
 
 
     }

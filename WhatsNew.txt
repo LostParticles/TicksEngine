@@ -1,10 +1,18 @@
+[TicksEngine 1.3]
+- Adjusted the naming again to ITicksPlayer  after thoughtful thinking and now the 
+   default players are WindowsTicksPlayer, and HardwareTicksPlayer
+
+- Now ITicksPlayer is now an inidividual interface because it doesn't need to implement ITicksManager.
+
+- MultiPlayer class to hold sub players that resemble tracks for example of midi file.
+
+
 [TicksEngine 1.2]
 -  Changed the name into TicksEngine   and reserved the domain name of it TicksEngine.com  .. and I have no money .. I am broke :D
 - Added HardwareTicksGenerator  
 
 
 [TickEvents 1.1]
-
 - Separated ITicksEventsManager into ITicksManager and ITicksGenerator.
 - Made a base class TicksManager that implements ITicksManager
 - Made WindowsTicksGenerator that inherit TicksManager and implement ITicksGenerator.

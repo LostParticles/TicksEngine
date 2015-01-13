@@ -11,13 +11,13 @@ namespace LostParticles.TicksEngine
     /// <summary>
     /// Ticks generator using the windows timer of 1000 milli second resolution
     /// </summary>
-    public sealed class WindowsTicksGenerator: TicksManager, ITicksGenerator
+    public sealed class WindowsTicksPlayer: TicksManager, ITicksPlayer
     {
 
         Timer MyTimer;
 
 
-        public WindowsTicksGenerator(double beatsPerMinute):base(beatsPerMinute)
+        public WindowsTicksPlayer(double beatsPerMinute):base(beatsPerMinute)
         {
             TimerCallback ElapsedTimer = MyTimer_Elapsed;
 
@@ -83,10 +83,17 @@ namespace LostParticles.TicksEngine
             }
         }
 
-        public void Start()
+        public void Play()
         {
             PreviousTick = (uint)Environment.TickCount;
             MyTimer.Change(0, (int)_TicksPerBeat / 2);
+        }
+
+        public void Pause()
+        {
+
+            MyTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
         }
 
         /// <summary>

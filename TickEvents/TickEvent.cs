@@ -65,6 +65,9 @@ namespace LostParticles.TicksEngine
 
         }
 
+
+        long? _HoldTicks;
+
         /// <summary>
         /// Number of Holding Ticks based on Holding Beats.
         /// </summary>
@@ -72,9 +75,16 @@ namespace LostParticles.TicksEngine
         {
             get 
             {
-                return (long)(HoldBeats * TicksPerBeat); 
+                if (_HoldTicks == null)
+                {
+                    _HoldTicks  = (long)(HoldBeats * TicksPerBeat); 
+                }
+                return _HoldTicks.Value;
             }
         }
+
+
+        long? _DurationTicks;
 
         /// <summary>
         /// Number of duration ticks based on Duration Beats
@@ -83,7 +93,11 @@ namespace LostParticles.TicksEngine
         {
             get 
             { 
-                return (long)(DurationBeats * TicksPerBeat); 
+                if(_DurationTicks == null)
+                {
+                    _DurationTicks = (long)(DurationBeats * TicksPerBeat);
+                }
+                return _DurationTicks.Value; 
             }
         }
 
@@ -172,9 +186,9 @@ namespace LostParticles.TicksEngine
         #endregion
 
         #region TickEvent Control Methods
-        private EventState _CurrentState = EventState.NotStarted;
+        private TickEventState _CurrentState = TickEventState.NotStarted;
 
-        public EventState CurrentState
+        public TickEventState CurrentState
         {
             get
             {
@@ -183,6 +197,7 @@ namespace LostParticles.TicksEngine
         }
 
         private EventArgs CurrentTickArgs;
+
         public EventArgs TickArgs
         {
 
@@ -221,7 +236,7 @@ namespace LostParticles.TicksEngine
 
         internal void AfterBegin()
         {
-            _CurrentState = EventState.Started;
+            _CurrentState = TickEventState.Started;
 
             if (TickEventStarted != null) TickEventStarted(this, TickArgs);
 
@@ -248,7 +263,7 @@ namespace LostParticles.TicksEngine
         /// </summary>
         internal void AfterEnd()
         {
-            _CurrentState = EventState.Ended;
+            _CurrentState = TickEventState.Ended;
             if (TickEventStopped != null) TickEventStopped(this, TickArgs);
         }
 
@@ -258,7 +273,7 @@ namespace LostParticles.TicksEngine
         /// </summary>
         public virtual void Suspend()
         {
-            _CurrentState = EventState.Suspended;
+            _CurrentState = TickEventState.Suspended;
             if (TickEventSuspended != null) TickEventSuspended(this, TickArgs);
         }
 
@@ -267,7 +282,7 @@ namespace LostParticles.TicksEngine
         /// </summary>
         public virtual void Resume()
         {
-            _CurrentState = EventState.Started;
+            _CurrentState = TickEventState.Started;
             if (TickEventResumed != null) TickEventResumed(this, TickArgs);
         }
 
@@ -277,8 +292,13 @@ namespace LostParticles.TicksEngine
         /// </summary>
         public virtual void Reset()
         {
-            _CurrentState = EventState.NotStarted;
+            _CurrentState = TickEventState.NotStarted;
             _ElapsedTicksSinceStart = 0;
+        }
+
+        public virtual void Restart()
+        {
+            
             if (TickEventRestarted != null) TickEventRestarted(this, TickArgs);
         }
 

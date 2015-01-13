@@ -3,7 +3,7 @@ namespace LostParticles.TicksEngine
     /// <summary>
     /// TickEvent State Enumeration.
     /// </summary>
-    public enum EventState
+    public enum TickEventState
     {
         NotStarted,
         Started,

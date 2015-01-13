@@ -9,12 +9,17 @@ namespace LostParticles.TicksEngine.Manager
     /// <summary>
     /// 
     /// </summary>
-    public interface ITicksGenerator : ITicksManager
+    public interface ITicksPlayer
     {
         /// <summary>
         /// Starts the tick generator based on tempo (beats per minute)
         /// </summary>
-        void Start();
+        void Play();
+
+        /// <summary>
+        /// Pauses the ticks generation
+        /// </summary>
+        void Pause();
 
         /// <summary>
         /// Stops the ticks generator.

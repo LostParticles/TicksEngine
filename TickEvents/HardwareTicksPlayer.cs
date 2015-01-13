@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace LostParticles.TicksEngine
 {
-    public class HardwareTicksGenerator : TicksManager, ITicksGenerator
+    public class HardwareTicksPlayer : TicksManager, ITicksPlayer
     {
 
 
-        public HardwareTicksGenerator(double beatsPerMinute)
+        public HardwareTicksPlayer(double beatsPerMinute)
             : base(beatsPerMinute)
         {
             
@@ -47,17 +47,26 @@ namespace LostParticles.TicksEngine
         IAsyncResult ar;
         Action<bool> PlayProc;
 
+        bool IsPaused = false;
+
         /// <summary>
         /// using Another Thread with high resolution performance counter
         /// </summary>
-        public void Start()
+        public void Play()
         {
             PlayProc = RunningPlayThread;
+
+            IsPaused = false;
 
             ar = PlayProc.BeginInvoke(true, null, null);
         }
 
 
+
+        public void Pause()
+        {
+            IsPaused = true;
+        }
 
 
         /// <summary>
@@ -68,17 +77,17 @@ namespace LostParticles.TicksEngine
 
             Stopwatch sw = Stopwatch.StartNew();
 
-            while (!IsFinished)
+            
+            while (IsFinished == false && IsPaused == false)
             {
                 CalculateAndSendStopWatchTicks(sw);
-
+                    
                 //Thread.Sleep(0); //make time for other threads must in uniprocessor environment
 
                 if (canStop)
                 {
                     //check if I {the current running proc} should stop
                 }
-
             }
 
             sw.Stop();

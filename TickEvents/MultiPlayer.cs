@@ -11,14 +11,15 @@ namespace LostParticles.TicksEngine
     /// <summary>
     /// This class will deal with more than one TickManager instance to synchronize between them all.
     /// </summary>
-    public class EventsPlayer
+    public class MultiPlayer : ITicksPlayer
     {
 
-        private List<ITicksManager> TicksManagers = new List<ITicksManager>();
 
-        public void AddTickManager(ITicksManager ticksManager)
+        private List<ITicksPlayer> TicksPlayers = new List<ITicksPlayer>();
+
+        public void AddTicksPlayer(ITicksPlayer ticksPlayer)
         {
-            TicksManagers.Add(ticksManager);
+            TicksPlayers.Add(ticksPlayer);
         }
 
 
@@ -101,7 +102,7 @@ namespace LostParticles.TicksEngine
 
         public void SendTick()
         {
-            foreach (ITicksManager atm in TicksManagers)
+            foreach (ITicksManager atm in TicksPlayers)
             {
                 atm.SendTick();
             }
@@ -109,7 +110,7 @@ namespace LostParticles.TicksEngine
 
         public void SendTicks(long ticks)
         {
-            foreach (ITicksManager atm in TicksManagers)
+            foreach (ITicksManager atm in TicksPlayers)
             {
                 lock (atm)
                 {
@@ -126,12 +127,23 @@ namespace LostParticles.TicksEngine
             {
                 bool fin = true;
 
-                foreach (ITicksManager tm in TicksManagers)
+                foreach (ITicksManager tm in TicksPlayers)
                 {
                     fin &= tm.IsFinished;
                 }
                 return fin;
             }
+        }
+
+
+        public void Pause()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Stop()
+        {
+            throw new NotImplementedException();
         }
     }
 }
