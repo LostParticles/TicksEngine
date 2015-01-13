@@ -19,7 +19,7 @@ the library contains `TickEvent` class that you should subclass it with your cus
 `durationBeats`: event execution duration.
 
 The tick events are sequential like the following image.
-![](https://github.com/LostParticles/TicksEngine/Documentation/TickEvents Plannging.png)
+![](https://github.com/LostParticles/TicksEngine/blob/master/Documentation/TickEvents%20Planning.png)
 
 and the ones with holdBeats = 0 will start at the same time.
 
